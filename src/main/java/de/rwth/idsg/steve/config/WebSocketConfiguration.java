@@ -28,7 +28,6 @@ import de.rwth.idsg.steve.web.validation.ChargeBoxIdValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jetty.websocket.core.WebSocketConstants;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
@@ -63,7 +62,7 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         OcppWebSocketHandshakeHandler handshakeHandler = new OcppWebSocketHandshakeHandler(
             chargeBoxIdValidator,
-            handshakeHandler(),
+            defaultHandshakeHandler(),
             Lists.newArrayList(ocpp16WebSocketEndpoint, ocpp15WebSocketEndpoint, ocpp12WebSocketEndpoint),
             chargePointRegistrationService
         );
@@ -78,8 +77,7 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
      *
      * Otherwise, defaults come from {@link WebSocketConstants}
      */
-    @Bean
-    public DefaultHandshakeHandler handshakeHandler() {
+    private static DefaultHandshakeHandler defaultHandshakeHandler() {
         JettyRequestUpgradeStrategy strategy = new JettyRequestUpgradeStrategy();
 
         strategy.addWebSocketConfigurer(configurable -> {

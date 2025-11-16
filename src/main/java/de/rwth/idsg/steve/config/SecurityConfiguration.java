@@ -18,84 +18,53 @@
  */
 package de.rwth.idsg.steve.config;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Bean;
+import de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategyEnum;
+import lombok.Data;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
-import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import org.springframework.security.web.session.InvalidSessionStrategy;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 07.01.2015
+ * @since 19.08.2014
  */
-@Slf4j
-@RequiredArgsConstructor
+@Data
 @Configuration
-@EnableWebSecurity
-public class SecurityConfiguration {
+@ConfigurationProperties(prefix = "steve")
+public class SteveProperties {
 
-    /**
-     * Password encoding changed with spring-security 5.0.0. We either have to use a prefix before the password to
-     * indicate which actual encoder {@link DelegatingPasswordEncoder} should use [1, 2] or specify the encoder as we do.
-     *
-     * [1] https://spring.io/blog/2017/11/01/spring-security-5-0-0-rc1-released#password-storage-format
-     * [2] {@link PasswordEncoderFactories#createDelegatingPasswordEncoder()}
-     */
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+    // Web frontend
+    public static final String SPRING_MANAGER_MAPPING = "/manager";
+    // Mapping for CXF SOAP services
+    public static final String CXF_MAPPING = "/services";
+    // Mapping for Web APIs
+    public static final String API_MAPPING = "/api";
+    // Dummy service path
+    public static final String ROUTER_ENDPOINT_PATH = "/CentralSystemService";
+    // Time zone for the application and database connections
+    public static final String TIME_ZONE_ID = "UTC";  // or ZoneId.systemDefault().getId();
+
+    String version;
+    Auth auth = new Auth();
+    Jooq jooq = new Jooq();
+    Ocpp ocpp = new Ocpp();
+
+    @Data
+    public static class Jooq {
+        boolean executiveLogging;
     }
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        final String prefix = SteveProperties.SPRING_MANAGER_MAPPING;
-
-        return http
-            .authorizeHttpRequests(
-                req -> req
-                    .requestMatchers(
-                        "/", // we have RootRedirectController to redirect "/" to "/manager"
-                        "/static/**",
-                        SteveProperties.CXF_MAPPING + "/**",
-                        WebSocketConfiguration.PATH_INFIX + "**",
-                        "/WEB-INF/views/**" // https://github.com/spring-projects/spring-security/issues/13285#issuecomment-1579097065
-                    ).permitAll()
-                    .requestMatchers(prefix + "/**").hasAuthority("ADMIN")
-            )
-            // SOAP stations are making POST calls for communication. even though the following path is permitted for
-            // all access, there is a global default behaviour from spring security: enable CSRF for all POSTs.
-            // we need to disable CSRF for SOAP paths explicitly.
-            .csrf(c -> c.ignoringRequestMatchers(SteveProperties.CXF_MAPPING + "/**"))
-            .sessionManagement(req -> req
-                .invalidSessionStrategy(new NoRedirectInvalidSessionStrategy(
-                    prefix + "/signin",
-                    prefix + "/signin"
-                ))
-                .sessionFixation().migrateSession() // Use migrateSession to avoid session issues behind proxy
-            )
-            .formLogin(req -> req.loginPage(prefix + "/signin").permitAll())
-            .logout(req -> req.logoutUrl(prefix + "/signout"))
-            .build();
+    @Data
+    public static class Auth {
+        String username;
+        String password;
+        String webApiKey;
+        String webApiSecret;
     }
 
-    @Bean
-    @Order(1)
-    public SecurityFilterChain apiKeyFilterChain(HttpSecurity http, ApiAuthenticationManager apiAuthenticationManager) throws Exception {
-        return http.securityMatcher(SteveProperties.API_MAPPING + "/**")
-            .csrf(k -> k.disable())
-            .sessionManagement(k -> k.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .addFilter(new BasicAuthenticationFilter(apiAuthenticationManager, apiAuthenticationManager))
-            .authorizeHttpRequests(k -> k.anyRequest().authenticated())
-            .build();
+    @Data
+    public static class Ocpp {
+        WsSessionSelectStrategyEnum wsSessionSelectStrategy;
+        boolean autoRegisterUnknownStations;
+        String chargeBoxIdValidationRegex;
     }
 }
