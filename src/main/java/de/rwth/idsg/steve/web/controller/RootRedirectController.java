@@ -18,9 +18,11 @@
  */
 package de.rwth.idsg.steve.web.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.view.RedirectView;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -32,6 +34,12 @@ public class RootRedirectController {
 
     @GetMapping
     public String redirectToManager() {
+        // Redirect to /steve/manager (with context path)
+        // The ingress will rewrite / to /steve/, so when the app receives /steve/,
+        // we redirect to /steve/manager (relative to context path)
+        // Return string redirect - RedirectConfiguration interceptor will convert to absolute URL
+        // This respects X-Forwarded-* headers when server.forward-headers-strategy = native
+        // Or uses server.external-hostname if configured
         return "redirect:/manager";
     }
 }
