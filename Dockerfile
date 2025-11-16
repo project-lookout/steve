@@ -30,6 +30,8 @@ COPY . /code
 # Maven build: Use -D flags to pass environment variables as Maven system properties
 # Java runtime: Use -D flags to pass environment variables as Java system properties (override properties file)
 CMD dockerize -wait tcp://${DB_HOST:-mariadb}:${DB_PORT:-3306} -timeout 60s && \
+echo "ADMIN_USERNAME: ${ADMIN_USERNAME}" && \
+echo "ADMIN_PASSWORD: ${ADMIN_PASSWORD}" && \
 ./mvnw clean package -Pkubernetes \
   -Ddb.ip=${DB_HOST} \
   -Ddb.port=${DB_PORT} \
