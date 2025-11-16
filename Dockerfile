@@ -35,7 +35,7 @@ CMD dockerize -wait tcp://${DB_HOST:-mariadb}:${DB_PORT:-3306} -timeout 60s && \
   -Ddb.port=${DB_PORT} \
   -Ddb.schema=${DB_DATABASE} \
   -Ddb.user=${DB_USERNAME} \
-  -Ddb.password=${DB_PASSWORD} && \
+  -Ddb.password=${DB_PASSWORD} \
   -Dauth.user=${ADMIN_USERNAME} \
   -Dauth.password=${ADMIN_PASSWORD} && \
 java -XX:MaxRAMPercentage=85 \
