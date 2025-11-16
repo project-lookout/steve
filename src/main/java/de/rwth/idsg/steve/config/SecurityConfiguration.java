@@ -70,7 +70,8 @@ public class SecurityConfiguration {
                         WebSocketConfiguration.PATH_INFIX + "**",
                         "/WEB-INF/views/**", // https://github.com/spring-projects/spring-security/issues/13285#issuecomment-1579097065
                         "/health",
-                        "/error"
+                        "/error",
+                        "/signin"
                     ).permitAll()
                     .requestMatchers(prefix + "/**").hasAuthority("ADMIN")
             )
