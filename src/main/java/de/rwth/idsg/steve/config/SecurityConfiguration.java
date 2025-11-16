@@ -68,7 +68,8 @@ public class SecurityConfiguration {
                         "/static/**",
                         SteveProperties.CXF_MAPPING + "/**",
                         WebSocketConfiguration.PATH_INFIX + "**",
-                        "/WEB-INF/views/**" // https://github.com/spring-projects/spring-security/issues/13285#issuecomment-1579097065
+                        "/WEB-INF/views/**", // https://github.com/spring-projects/spring-security/issues/13285#issuecomment-1579097065
+                        "/steve/health"
                     ).permitAll()
                     .requestMatchers(prefix + "/**").hasAuthority("ADMIN")
             )
