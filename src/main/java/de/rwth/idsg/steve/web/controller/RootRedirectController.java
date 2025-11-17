@@ -29,7 +29,7 @@ import org.springframework.web.servlet.view.RedirectView;
  * @since 17.09.2025
  */
 @Controller
-@RequestMapping("/", "/steve")
+@RequestMapping("/")
 public class RootRedirectController {
 
     @GetMapping
