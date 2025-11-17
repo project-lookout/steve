@@ -71,7 +71,9 @@ public class SecurityConfiguration {
                         "/WEB-INF/views/**", // https://github.com/spring-projects/spring-security/issues/13285#issuecomment-1579097065
                         "/health",
                         "/error",
-                        "/signin"
+                        "/signin",
+                        prefix + "/signin",   // Allow /manager/signin without authentication (needed after logout)
+                        prefix + "/signout"   // Allow /manager/signout without authentication
                     ).permitAll()
                     .requestMatchers(prefix + "/**").hasAuthority("ADMIN")
             )
