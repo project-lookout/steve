@@ -10,7 +10,7 @@ spring:
 server:
   address: ${server.host}
   port: ${http.port}
-  servlet.context-path: /
+  servlet.context-path: /${context.path}
   compression:
     enabled: ${server.gzip.enabled}
   ssl:
