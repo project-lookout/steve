@@ -31,3 +31,11 @@ steve:
     ws-session-select-strategy: ${ws.session.select.strategy}
     auto-register-unknown-stations: ${auto.register.unknown.stations}
     charge-box-id-validation-regex: ${charge-box-id.validation.regex}
+
+logging:
+  level:
+    # Enable debug logging for session handling to troubleshoot invalid session issues
+    de.rwth.idsg.steve.config.NoRedirectInvalidSessionStrategy: DEBUG
+    org.springframework.security.web.session: DEBUG
+    # Uncomment the line below for more detailed Spring Security debugging (can be verbose)
+    org.springframework.security: DEBUG
